@@ -2,9 +2,9 @@ import { Octokit } from "@octokit/rest";
 import { VERSION } from "./version.js";
 
 // user defined variables
-const ORG_SRC: string = "source-org-test" // name of the GitHub Org the repos are being copied FROM
-const ORG_DST: string = "dest-org-test" // name of the GitHub Org the repos are being copied TO
-const PREFIX_DST: string = "nerk" // prefix to place on the repo name in the destination Organization
+const ORG_SRC: string = ""    // name of the GitHub Org the repos are being copied FROM
+const ORG_DST: string = ""    // name of the GitHub Org the repos are being copied TO
+const PREFIX_DST: string = "" // prefix to place on the repo name in the destination Organization
 
 // Initialise Octokit
 const octokit = new Octokit({
@@ -50,7 +50,7 @@ async function transferReposFromOrgToOrg(currentOrg: string, newOrg: string) {
 
     // Transfer each repository to the new organization with renaming
     for (const repoName of repoNames) {
-      const newName = `${PREFIX_DST}-${repoName}`;
+      const newName = `${PREFIX_DST}${repoName}`;
       await transferRepository(repoName, currentOrg, newOrg, newName);
     }
 
@@ -60,5 +60,5 @@ async function transferReposFromOrgToOrg(currentOrg: string, newOrg: string) {
   }
 }
 
-// Example usage: Transfer repositories from ORG_SRC to ORG_DST
+// Transfer repositories from ORG_SRC to ORG_DST
 transferReposFromOrgToOrg(ORG_SRC, ORG_DST);
