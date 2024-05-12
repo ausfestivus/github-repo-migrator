@@ -1,5 +1,4 @@
 import { Octokit } from "@octokit/rest";
-import { createTokenAuth } from "@octokit/auth-token";
 import { VERSION } from "./version.js";
 
 // user defined variables
@@ -17,22 +16,40 @@ const ORG_DST: string = "dest-org-test"
 // non user servicable variables
 
 
-// PoC to validate we can get the Octokit SDK working
+// Initialise Octokit
 const octokit = new Octokit({
     auth: process.env.GH_PAT,
     userAgent: 'github-repo-migrator-' + VERSION,
     log: console,
 });
 
-// Compare: https://docs.github.com/en/rest/reference/repos/#list-organization-repositories
-octokit.rest.repos
-  .listForOrg({
-    org: "best-family",
-    type: "public",
-  })
-  .then(({ data }) => {
-    // handle data
-  });
+// Async function to list repos in an Organization
+async function getOrgRepos(org: string) {
+  try {
+    const orgRepoList = await octokit.repos.listForOrg({
+      //per_page: 100,
+      org,
+    });
+    console.log(orgRepoList.data.map(repo => repo.name));
+  } catch (error) {
+    console.error('Error fetching Organization:', error);
+  }
+}
 
-// display selected details about a GitHub Organization
-//export function displayOrganization {}
+// Async function to transfer a repository from one organization to another
+async function transferRepository(repo: string, currentOwner: string, newOwner: string) {
+  try {
+    const response = await octokit.repos.transfer({
+      owner: currentOwner,
+      repo: repo,
+      new_owner: newOwner
+    });
+    console.log(`Repository transferred. Status: ${response.status}`);
+    console.log(response.data);
+  } catch (error) {
+    console.error('Error transferring repository:', error);
+  }
+}
+
+// Output the list of repos for the supplied Org
+getOrgRepos(ORG_SRC)
